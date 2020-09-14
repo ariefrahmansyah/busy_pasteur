@@ -26,6 +26,11 @@ jobs:
           --type merge \
           --patch '{"data":{"127.0.0.1.xip.io":""}}'
 
+    - name: Install Cert Manager
+      run: |
+        kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.yaml
+        kubectl wait --for=condition=available --timeout=600s deployment/cert-manager-webhook -n cert-manager
+
     - name: Install KFServing
       run: |
         kubectl apply --filename https://raw.githubusercontent.com/kubeflow/kfserving/master/install/v0.4.0/kfserving.yaml
