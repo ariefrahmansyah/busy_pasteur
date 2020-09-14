@@ -8,7 +8,7 @@ jobs:
 
     - name: Setup Kind
       run: |
-        kind create cluster --config=kind-config.yaml
+        kind create cluster --config=kind-config.yaml --image kindest/node:v1.17.11
 
     - name: Install Knative serving
       run: |
