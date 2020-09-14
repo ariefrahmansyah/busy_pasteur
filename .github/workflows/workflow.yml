@@ -16,7 +16,7 @@ jobs:
 
     - name: Setup Kind
       run: |
-        kind create cluster --config=kind-config.yaml
+        kind create cluster --config=main/kind-config.yaml
 
     - name: Quick Install KFServing
       run: |
