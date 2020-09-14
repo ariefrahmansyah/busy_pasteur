@@ -10,7 +10,7 @@ jobs:
     - name: Setup Kind
       run: |
         kind create cluster --config=kind-config.yaml
-    
+
     - name: Install Knative serving
       run: |
         kubectl apply --filename https://github.com/knative/serving/releases/download/v0.17.0/serving-crds.yaml
@@ -20,58 +20,17 @@ jobs:
       run: |
         curl -sL https://istio.io/downloadIstio | ISTIO_VERSION=1.7.0 sh -
         sudo install istio-1.7.0/bin/istioctl /usr/bin/istioctl
-        istioctl install -f istio-minimal-operator.yaml 
+        istioctl install -f istio-minimal-operator.yaml
         kubectl apply --filename https://github.com/knative/net-istio/releases/download/v0.17.0/release.yaml
         kubectl patch configmap/config-domain \
           --namespace knative-serving \
           --type merge \
           --patch '{"data":{"127.0.0.1.xip.io":""}}'
 
-    - name: Kubernetes Node Status
-      run: kubectl describe nodes
-
-    - name: Test Knative Service with Istio
+    - name: Install KFServing
       run: |
-        sleep 60
-        kubectl apply -f deploy-knative-services/
-        kubectl wait --for=condition=Ready --timeout=90s service.serving.knative.dev/foo
-        
-        # POD=$(kubectl get pod -l serving.knative.dev/service=foo --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[0].metadata.name}')
-        # kubectl describe pod $POD
-        # kubectl get pod $POD -o yaml
-        # kubectl logs $POD -c user-container
-        # kubectl logs $POD -c queue-proxy
+        kubectl apply --filename https://raw.githubusercontent.com/kubeflow/kfserving/master/install/v0.4.0/kfserving.yaml
 
-        # sleep 15
-        # kubectl get pod,kservice,revision,podautoscaler,deployment,virtualservice,gateway
-
-        # sleep 15
-        # kubectl get pod,kservice,revision,podautoscaler,deployment
-
-        curl -D - -s http://foo.default.127.0.0.1.xip.io
-        curl -D - -s http://bar.default.127.0.0.1.xip.io
-
-        kubectl get pod,kservice,revision,podautoscaler,deployment
-
-        echo -e "\033[1;32m====================================\033[0m"
-
-        POD=$(kubectl get pod -l serving.knative.dev/service=foo --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[0].metadata.name}')
-        kubectl describe pod $POD 
-        kubectl get pod $POD -o yaml
-
-        echo Sleeping for 240s
-        sleep 240
-        kubectl get pod,revision
-
-
-    - name: Kube Node Status
-      run: kubectl describe nodes
-    # - name: Test Ingress
-    #   run: |
-    #     kubectl apply -f test-ingress.yaml
-    #     sleep 5
-    #     kubectl get all,ingress
-    #     sleep 30
-    #     kubectl get all,ingress
-    #     curl localhost/foo
-    #     curl localhost/bar
+    - name: Check KFServing installation
+      run: |
+        kubectl get po -n kfserving-system
