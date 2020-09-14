@@ -1,6 +1,5 @@
 name: "Create cluster using KinD"
 on: [pull_request, push]
-
 jobs:
   kind:
     runs-on: ubuntu-latest
