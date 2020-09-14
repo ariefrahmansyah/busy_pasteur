@@ -37,4 +37,7 @@ jobs:
 
     - name: Check KFServing installation
       run: |
-        kubectl get po -n kfserving-system
+        sleep 60
+        kubectl rollout status statefulset kfserving-controller-manager -n kfserving-system
+        kubectl get po -n kfserving-system -o yaml
+        kubectl get all --all-namespaces
