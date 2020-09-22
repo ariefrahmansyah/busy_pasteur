@@ -20,4 +20,4 @@ jobs:
 
     - name: Quick Install KFServing
       run: |
-        ./hack/quick_install.sh
+        .kfserving/hack/quick_install.sh
