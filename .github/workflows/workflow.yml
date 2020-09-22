@@ -46,4 +46,9 @@ jobs:
         kubectl apply -f https://raw.githubusercontent.com/kubeflow/kfserving/master/docs/samples/sklearn/sklearn.yaml -n kfserving-test
 
         sleep 30
+        echo "==="
         kubectl get inferenceservices sklearn-iris -n kfserving-test
+        kubectl get inferenceservices sklearn-iris -n kfserving-test -o yaml
+
+        echo "==="
+        kubectl get all -n kfserving-test
