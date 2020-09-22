@@ -16,7 +16,7 @@ jobs:
 
     - name: Setup Kind
       run: |
-        kind create cluster --config=kind-config.yaml --image kindest/node:v1.17.11
+        kind create cluster --config=main/kind-config.yaml --image kindest/node:v1.17.11
 
     - name: Quick Install KFServing
       run: |
