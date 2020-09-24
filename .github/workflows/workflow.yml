@@ -12,10 +12,9 @@ jobs:
 
     - name: Test KFServing installation
       run: |
-        sleep 30
         kubectl create namespace kfserving-test
         kubectl apply -f sklearn.yaml -n kfserving-test
 
-        sleep 180
+        kubectl wait --for=condition=ready inferenceservice/sklearn-iris -n kfserving-test
 
         kubectl describe all -n kfserving-test
