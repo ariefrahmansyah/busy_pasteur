@@ -17,4 +17,4 @@ jobs:
 
         kubectl wait --for=condition=ready inferenceservice/sklearn-iris -n kfserving-test
 
-        kubectl describe all -n kfserving-test
+        kubectl get svc istio-ingressgateway -n istio-system
