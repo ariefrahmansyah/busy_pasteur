@@ -14,7 +14,8 @@ jobs:
       run: |
         kubectl apply --filename https://github.com/knative/serving/releases/download/v0.15.0/serving-crds.yaml
         kubectl apply --filename https://github.com/knative/serving/releases/download/v0.15.0/serving-core.yaml
-        kubectl wait pod --for=condition=Ready -n knative-serving  -l app=webhook --timeout=300s
+        sleep 30
+        kubectl wait pod --for=condition=ready -n knative-serving  -l app=webhook --timeout=300s
         echo "==="
 
         curl -sL https://istio.io/downloadIstio | ISTIO_VERSION=1.6.2 sh -
