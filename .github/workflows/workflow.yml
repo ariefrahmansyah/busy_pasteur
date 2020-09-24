@@ -32,12 +32,11 @@ jobs:
         echo "=== Install Cert Manager"
         kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.yaml
         kubectl wait --for=condition=available --timeout=600s deployment/cert-manager-webhook -n cert-manager
-        sleep 30
 
-        echo "=== Install KFServing"
+    - name: Install KFServing
+      run: |
         kubectl apply --filename https://raw.githubusercontent.com/kubeflow/kfserving/master/install/v0.4.0/kfserving.yaml
         kubectl wait --for=condition=ready --timeout=600s pod/kfserving-controller-manager-0 -n kfserving-system
-        sleep 10
 
     - name: Test KFServing installation
       run: |
