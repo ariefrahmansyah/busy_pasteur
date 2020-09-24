@@ -10,13 +10,13 @@ jobs:
       run: |
         kind create cluster --config=kind-config.yaml --image kindest/node:v1.17.11
 
-    - name: Install Knative serving
+    - name: Install Knative and Istio
       run: |
         kubectl apply --filename https://github.com/knative/serving/releases/download/v0.15.0/serving-crds.yaml
         kubectl apply --filename knative-serving-core.yaml
+        kubectl wait pod --for=condition=Ready -n knative-serving  -l app=webhook --timeout=300s
+        echo "==="
 
-    - name: Install Knative Istio
-      run: |
         curl -sL https://istio.io/downloadIstio | ISTIO_VERSION=1.6.2 sh -
         sudo install istio-1.6.2/bin/istioctl /usr/bin/istioctl
         istioctl install -f istio-minimal-operator.yaml
