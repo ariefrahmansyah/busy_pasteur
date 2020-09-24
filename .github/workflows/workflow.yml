@@ -18,3 +18,5 @@ jobs:
         kubectl apply -f sklearn.yaml -n kfserving-test
 
         kubectl wait inferenceservice/sklearn-iris --for=condition=ready -n=kfserving-test --timeout=300s
+
+        curl http://sklearn-iris-predictor-default.kfserving-test.127.0.0.1.xip.io/v1/models/sklearn-iris:predict
