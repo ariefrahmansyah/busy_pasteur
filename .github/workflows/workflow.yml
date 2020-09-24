@@ -47,11 +47,11 @@ jobs:
         kubectl apply -f https://raw.githubusercontent.com/kubeflow/kfserving/master/docs/samples/sklearn/sklearn.yaml -n kfserving-test
 
         echo "==="
-        kubectl wait --for=condition=ready inferenceservice/sklearn-iris -n kfserving-test --timeout=3000s
+        sleep 180
         kubectl get inferenceservices sklearn-iris -n kfserving-test
         kubectl describe inferenceservices sklearn-iris -n kfserving-test
         kubectl get inferenceservices sklearn-iris -n kfserving-test -o yaml
 
-        kubectl logs -l model=sklearn-iris -c kfserving-container -n kfserving-test
+        kubectl get all -n kfserving-test
 
         kubectl logs -l control-plane=kfserving-controller-manager -c manager -n kfserving-system
