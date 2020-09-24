@@ -11,14 +11,10 @@ export KFSERVING_VERSION=v0.4.0
 # Provision KinD cluster
 kind create cluster --config=kind-config.yaml --image=kindest/node:${KIND_NODE_VERSION}
 
-sleep 30
-
 # Install Knative
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-crds.yaml
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-core.yaml
 kubectl wait pod --selector=app=webhook --namespace=knative-serving --for=condition=ready --timeout=300s
-
-sleep 30
 
 # Install Istio
 curl --location https://git.io/getLatestIstio | sh -
@@ -28,13 +24,11 @@ istioctl install --filename=istio-minimal-operator.yaml
 kubectl apply --filename=https://github.com/knative/net-istio/releases/download/v0.15.0/release.yaml
 kubectl patch configmap/config-domain --namespace=knative-serving --type=merge --patch='{"data":{"127.0.0.1.xip.io":""}}'
 
-sleep 30
-
 # Install Cert Manager
 kubectl apply --validate=false --filename=https://github.com/jetstack/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml
 kubectl wait deployment/cert-manager-webhook --namespace=cert-manager --for=condition=available --timeout=600s
 
-sleep 30
+sleep 10
 
 # Install KFServing
 kubectl apply --filename=https://raw.githubusercontent.com/kubeflow/kfserving/master/install/${KFSERVING_VERSION}/kfserving.yaml
