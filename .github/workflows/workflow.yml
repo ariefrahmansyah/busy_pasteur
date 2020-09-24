@@ -25,8 +25,6 @@ jobs:
           --namespace knative-serving \
           --type merge \
           --patch '{"data":{"127.0.0.1.xip.io":""}}'
-        kubectl scale deployment/istio-ingressgateway --replicas=1 -n istio-system
-        sleep 30
 
     - name: Install Cert Manager
       run: |
