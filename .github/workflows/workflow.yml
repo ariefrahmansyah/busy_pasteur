@@ -6,18 +6,18 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
-    - name: Setup Kind
+    - name: Prepare cluster
       run: |
-        kind create cluster --config=kind-config.yaml --image kindest/node:v1.17.11
+        echo "=== Create Cluster"
+        kind create cluster
+        sleep 10
 
-    - name: Install Knative and Istio
-      run: |
+        echo "=== Install Knative"
         kubectl apply --filename https://github.com/knative/serving/releases/download/v0.15.0/serving-crds.yaml
         kubectl apply --filename https://github.com/knative/serving/releases/download/v0.15.0/serving-core.yaml
-        sleep 30
-        kubectl wait pod --for=condition=ready -n knative-serving  -l app=webhook --timeout=300s
-        echo "==="
+        sleep 10
 
+        echo "=== Install Istio"
         curl -sL https://istio.io/downloadIstio | ISTIO_VERSION=1.6.2 sh -
         sudo install istio-1.6.2/bin/istioctl /usr/bin/istioctl
         istioctl install -f istio-minimal-operator.yaml
@@ -26,34 +26,25 @@ jobs:
           --namespace knative-serving \
           --type merge \
           --patch '{"data":{"127.0.0.1.xip.io":""}}'
+        kubectl get svc istio-ingressgateway -n istio-system
+        sleep 10
 
-    - name: Install Cert Manager
-      run: |
+        echo "=== Install Cert Manager"
         kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.yaml
         kubectl wait --for=condition=available --timeout=600s deployment/cert-manager-webhook -n cert-manager
+        sleep 10
 
-    - name: Install KFServing
-      run: |
+        echo "=== Install KFServing"
         kubectl apply --filename https://raw.githubusercontent.com/kubeflow/kfserving/master/install/v0.4.0/kfserving.yaml
+        kubectl wait --for=condition=available --timeout=600s statefulset/kfserving-controller-manager -n kfserving-system
+        sleep 10
 
     - name: Test KFServing installation
       run: |
-        kubectl get svc istio-ingressgateway -n istio-system
-        echo "==="
-
-        sleep 60
-        kubectl rollout status statefulset kfserving-controller-manager -n kfserving-system
-
         kubectl create namespace kfserving-test
         kubectl apply -f https://raw.githubusercontent.com/kubeflow/kfserving/master/docs/samples/sklearn/sklearn.yaml -n kfserving-test
 
-        echo "==="
         sleep 180
-        kubectl get inferenceservices sklearn-iris -n kfserving-test
-        kubectl describe inferenceservices sklearn-iris -n kfserving-test
-        kubectl get inferenceservices sklearn-iris -n kfserving-test -o yaml
-
-        kubectl get all -n kfserving-test
 
         echo "=== kfserving controller log"
         kubectl logs -l control-plane=kfserving-controller-manager -c manager -n kfserving-system
