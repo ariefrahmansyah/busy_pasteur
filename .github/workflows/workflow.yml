@@ -36,7 +36,7 @@ jobs:
 
         echo "=== Install KFServing"
         kubectl apply --filename https://raw.githubusercontent.com/kubeflow/kfserving/master/install/v0.4.0/kfserving.yaml
-        kubectl wait --for=condition=available --timeout=600s statefulset/kfserving-controller-manager -n kfserving-system
+        kubectl wait --for=condition=ready --timeout=600s pod/kfserving-controller-manager-0 -n kfserving-system
         sleep 10
 
     - name: Test KFServing installation
@@ -46,9 +46,4 @@ jobs:
 
         sleep 180
 
-        echo "=== kfserving controller log"
-        kubectl logs -l control-plane=kfserving-controller-manager -c manager -n kfserving-system
-        echo "=== knative controller log"
-        kubectl logs -l app=controller -n knative-serving
-        echo "=== knative webhook log"
-        kubectl logs -l app=webhook -n knative-serving
+        kubectl describe all -n kfserving-test
