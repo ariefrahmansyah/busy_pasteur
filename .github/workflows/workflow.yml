@@ -12,9 +12,9 @@ jobs:
 
     - name: Test KFServing installation
       run: |
+        kubectl get svc istio-ingressgateway -n istio-system
+
         kubectl create namespace kfserving-test
         kubectl apply -f sklearn.yaml -n kfserving-test
 
-        kubectl wait --for=condition=ready inferenceservice/sklearn-iris -n kfserving-test
-
-        kubectl get svc istio-ingressgateway -n istio-system
+        kubectl wait inferenceservice/sklearn-iris --for=condition=ready -n=kfserving-test --timeout=300s
