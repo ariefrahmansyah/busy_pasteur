@@ -55,4 +55,9 @@ jobs:
 
         kubectl get all -n kfserving-test
 
+        echo "=== kfserving controller log"
         kubectl logs -l control-plane=kfserving-controller-manager -c manager -n kfserving-system
+        echo "=== knative controller log"
+        kubectl logs -l app=controller -n knative-serving
+        echo "=== knative webhook log"
+        kubectl logs -l app=webhook -n knative-serving
