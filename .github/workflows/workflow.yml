@@ -38,6 +38,7 @@ jobs:
 
     - name: Test KFServing installation
       run: |
+        sleep 30
         kubectl create namespace kfserving-test
         kubectl apply -f sklearn.yaml -n kfserving-test
 
