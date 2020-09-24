@@ -1,0 +1,23 @@
+name: "Initialize KFServing cluster using KinD"
+on: [pull_request, push]
+jobs:
+  kind:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        path: main
+
+    - name: Checkout KFServing
+      uses: actions/checkout@v2
+      with:
+        repository: kubeflow/kfserving
+        path: kfserving
+
+    - name: Setup Kind
+      run: |
+        kind create cluster
+
+    - name: Quick Install KFServing
+      run: |
+        ./kfserving/hack/quick_install.sh

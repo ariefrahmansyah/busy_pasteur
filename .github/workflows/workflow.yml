@@ -39,8 +39,6 @@ jobs:
       run: |
         sleep 60
         kubectl rollout status statefulset kfserving-controller-manager -n kfserving-system
-        kubectl get po -n kfserving-system -o yaml
-        kubectl get all --all-namespaces
 
         kubectl create namespace kfserving-test
         kubectl apply -f https://raw.githubusercontent.com/kubeflow/kfserving/master/docs/samples/sklearn/sklearn.yaml -n kfserving-test
