@@ -15,7 +15,7 @@ spec:
     pilot:
       resources:
         requests:
-          cpu: 200m
+          cpu: 100m
 
   addonComponents:
     pilot:
@@ -40,7 +40,7 @@ spec:
             memory: 128Mi
           limits:
             cpu: 200m
-            memory: 256Mi
+            memory: 128Mi
     - name: cluster-local-gateway
       enabled: true
       label:
@@ -52,8 +52,8 @@ spec:
             cpu: 100m
             memory: 128Mi
           limits:
-            cpu: 200m
-            memory: 256Mi
+            cpu: 100m
+            memory: 128Mi
         service:
           type: ClusterIP
           ports:
