@@ -28,10 +28,10 @@ kubectl patch configmap/config-domain --namespace=knative-serving --type=merge -
 kubectl apply --validate=false --filename=https://github.com/jetstack/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml
 kubectl wait deployment/cert-manager-webhook --namespace=cert-manager --for=condition=available --timeout=600s
 
-sleep 10
-
 # Install KFServing
 kubectl apply --filename=https://raw.githubusercontent.com/kubeflow/kfserving/master/install/${KFSERVING_VERSION}/kfserving.yaml
 kubectl wait pod/kfserving-controller-manager-0 --namespace=kfserving-system --for=condition=ready --timeout=300s
+
+sleep 10
 
 set +ex
