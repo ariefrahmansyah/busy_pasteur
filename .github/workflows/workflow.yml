@@ -13,7 +13,7 @@ jobs:
     - name: Install Knative and Istio
       run: |
         kubectl apply --filename https://github.com/knative/serving/releases/download/v0.15.0/serving-crds.yaml
-        kubectl apply --filename knative-serving-core.yaml
+        kubectl apply --filename https://github.com/knative/serving/releases/download/v0.15.0/serving-core.yaml
         kubectl wait pod --for=condition=Ready -n knative-serving  -l app=webhook --timeout=300s
         echo "==="
 
