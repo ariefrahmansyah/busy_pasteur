@@ -39,7 +39,7 @@ jobs:
     - name: Test KFServing installation
       run: |
         kubectl create namespace kfserving-test
-        kubectl apply -f https://raw.githubusercontent.com/kubeflow/kfserving/master/docs/samples/sklearn/sklearn.yaml -n kfserving-test
+        kubectl apply -f sklearn.yaml -n kfserving-test
 
         sleep 180
 
