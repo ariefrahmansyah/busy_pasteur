@@ -14,9 +14,7 @@ kind create cluster --config=kind-config.yaml --image=kindest/node:${KIND_NODE_V
 # Install Knative
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-crds.yaml
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-core.yaml
-sleep 15
-kubectl get po --all-namespaces
-kubectl wait pod --selector=app=webhook --namespace=knative-serving --for=condition=ready --timeout=300s
+kubectl wait deployment.apps/webhook --namespace=knative-serving --for=condition=available --timeout=300s
 
 # Install Istio
 curl --location https://git.io/getLatestIstio | sh -
