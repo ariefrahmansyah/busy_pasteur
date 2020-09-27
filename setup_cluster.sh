@@ -25,16 +25,16 @@ kubectl apply --filename=https://github.com/knative/serving/releases/download/${
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-core.yaml
 
 kubectl wait deployment.apps/activator --namespace=knative-serving --for=condition=available --timeout=300s
-kubectl set resources deployment activator --containers=activator --limits=cpu=300m,memory=60Mi
+kubectl set resources deployment activator --namespace=knative-serving --containers=activator --limits=cpu=300m,memory=60Mi
 
 kubectl wait deployment.apps/autoscaler --namespace=knative-serving --for=condition=available --timeout=300s
-kubectl set resources deployment autoscaler --containers=autoscaler --limits=cpu=30m,memory=40Mi
+kubectl set resources deployment autoscaler --namespace=knative-serving --containers=autoscaler --limits=cpu=30m,memory=40Mi
 
 kubectl wait deployment.apps/controller --namespace=knative-serving --for=condition=available --timeout=300s
-kubectl set resources deployment controller --containers=controller --limits=cpu=100m,memory=100Mi
+kubectl set resources deployment controller --namespace=knative-serving --containers=controller --limits=cpu=100m,memory=100Mi
 
 kubectl wait deployment.apps/webhook --namespace=knative-serving --for=condition=available --timeout=300s
-kubectl set resources deployment webhook --containers=webhook --limits=cpu=100m,memory=100Mi
+kubectl set resources deployment webhook --namespace=knative-serving --containers=webhook --limits=cpu=100m,memory=100Mi
 
 # Install Istio
 curl --location https://git.io/getLatestIstio | sh -
