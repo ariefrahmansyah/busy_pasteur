@@ -59,9 +59,9 @@ kubectl apply --validate=false --filename=https://github.com/jetstack/cert-manag
 kubectl wait deployment/cert-manager-webhook --namespace=cert-manager --for=condition=available --timeout=600s
 
 # Install Spark Operator
-# kubectl create namespace spark-operator
-# helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
-# helm install spark-operator incubator/sparkoperator --version=${SPARK_OPERATOR_VERSION} --values=spark-operator-values.yaml --namespace=spark-operator --wait --timeout 600s
+kubectl create namespace spark-operator
+helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
+helm install spark-operator incubator/sparkoperator --version=${SPARK_OPERATOR_VERSION} --values=spark-operator-values.yaml --namespace=spark-operator --wait --timeout 600s
 
 # Install KFServing
 kubectl apply --filename=https://raw.githubusercontent.com/kubeflow/kfserving/master/install/${KFSERVING_VERSION}/kfserving.yaml
