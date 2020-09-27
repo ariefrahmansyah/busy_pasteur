@@ -19,12 +19,22 @@ pip3 install yq
 
 # Provision KinD cluster
 kind create cluster --name=${CLUSTER_NAME} --config=kind-config.yaml --image=kindest/node:${KIND_NODE_VERSION}
-sleep 10
 
 # Install Knative
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-crds.yaml
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-core.yaml
+
+kubectl wait deployment.apps/activator --namespace=knative-serving --for=condition=available --timeout=300s
+kubectl set resources deployment activator --containers=activator --limits=cpu=300m,memory=60Mi
+
+kubectl wait deployment.apps/autoscaler --namespace=knative-serving --for=condition=available --timeout=300s
+kubectl set resources deployment autoscaler --containers=autoscaler --limits=cpu=30m,memory=40Mi
+
+kubectl wait deployment.apps/controller --namespace=knative-serving --for=condition=available --timeout=300s
+kubectl set resources deployment controller --containers=controller --limits=cpu=100m,memory=100Mi
+
 kubectl wait deployment.apps/webhook --namespace=knative-serving --for=condition=available --timeout=300s
+kubectl set resources deployment webhook --containers=webhook --limits=cpu=100m,memory=100Mi
 
 # Install Istio
 curl --location https://git.io/getLatestIstio | sh -
@@ -38,17 +48,14 @@ kubectl patch configmap/config-domain --namespace=knative-serving --type=merge -
 kubectl apply --validate=false --filename=https://github.com/jetstack/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml
 kubectl wait deployment/cert-manager-webhook --namespace=cert-manager --for=condition=available --timeout=600s
 
-# Install KFServing
-kubectl apply --filename=https://raw.githubusercontent.com/kubeflow/kfserving/master/install/${KFSERVING_VERSION}/kfserving.yaml
-kubectl wait pod/kfserving-controller-manager-0 --namespace=kfserving-system --for=condition=ready --timeout=300s
-
 # Install Spark Operator
 kubectl create namespace spark-operator
 helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
 helm install spark-operator incubator/sparkoperator --version=${SPARK_OPERATOR_VERSION} --values=spark-operator-values.yaml --namespace=spark-operator --wait --timeout 600s
-sleep 120
-kubectl get po --namespace=spark-operator
-kubectl get po -o yaml --namespace=spark-operator
+
+# Install KFServing
+kubectl apply --filename=https://raw.githubusercontent.com/kubeflow/kfserving/master/install/${KFSERVING_VERSION}/kfserving.yaml
+kubectl wait pod/kfserving-controller-manager-0 --namespace=kfserving-system --for=condition=ready --timeout=300s
 
 # Install Vault
 kubectl create namespace vault
