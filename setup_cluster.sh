@@ -38,6 +38,8 @@ kubectl create namespace vault
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm install vault hashicorp/vault --version=${VAULT_VERSION} --values=vault-values.yaml --namespace=vault
 kubectl describe statefulset.apps --namespace=vault
+sleep 30
+kubectl get pod --namespace=vault
 
 # kubectl exec -it vault-0 --namespace=vault -- vault operator init -key-shares=1 -key-threshold=1 -format=json
 
