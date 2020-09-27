@@ -19,6 +19,7 @@ pip3 install yq
 
 # Provision KinD cluster
 kind create cluster --name=${CLUSTER_NAME} --config=kind-config.yaml --image=kindest/node:${KIND_NODE_VERSION}
+sleep 10
 
 # Install Knative
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-crds.yaml
@@ -65,8 +66,6 @@ kubectl exec vault-0 --namespace=vault -- vault secrets disable secret
 kubectl exec vault-0 --namespace=vault -- vault secrets enable -version=1 -path=secret kv
 
 # Put KinD cluster credential to Vault
-sleep 15
-kubectl describe nodes
 kubectl get pods --all-namespaces
 kind get kubeconfig > kubeconfig.yaml
 cat <<EOF > cluster-credential.json
