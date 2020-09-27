@@ -19,67 +19,67 @@ pip3 install yq
 
 # Provision KinD cluster
 kind create cluster --name=${CLUSTER_NAME} --config=kind-config.yaml --image=kindest/node:${KIND_NODE_VERSION}
-sleep 10
 kind get clusters
-kind get kubeconfig > kubeconfig.yaml
+kind get kubeconfig
+# kind get kubeconfig > kubeconfig.yaml
 
-# Write cluster credential to be saved in Vault
-cat <<EOF > cluster-credential.json
-{
-  "name": "$(yq -r '.clusters[0].name' kubeconfig.yaml)",
-  "master_ip": "$(yq -r '.clusters[0].cluster.server' kubeconfig.yaml)",
-  "certs": "$(yq -r '.clusters[0].cluster."certificate-authority-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')",
-  "client_certificate": "$(yq -r '.users[0].user."client-certificate-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')",
-  "client_key": "$(yq -r '.users[0].user."client-key-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')"
-}
-EOF
+# # Write cluster credential to be saved in Vault
+# cat <<EOF > cluster-credential.json
+# {
+#   "name": "$(yq -r '.clusters[0].name' kubeconfig.yaml)",
+#   "master_ip": "$(yq -r '.clusters[0].cluster.server' kubeconfig.yaml)",
+#   "certs": "$(yq -r '.clusters[0].cluster."certificate-authority-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')",
+#   "client_certificate": "$(yq -r '.users[0].user."client-certificate-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')",
+#   "client_key": "$(yq -r '.users[0].user."client-key-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')"
+# }
+# EOF
 
-# Install Knative
-kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-crds.yaml
-kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-core.yaml
+# # Install Knative
+# kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-crds.yaml
+# kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-core.yaml
 
-kubectl set resources deployment activator --namespace=knative-serving --containers=activator --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
-kubectl set resources deployment autoscaler --namespace=knative-serving --containers=autoscaler --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
-kubectl set resources deployment controller --namespace=knative-serving --containers=controller --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
-kubectl set resources deployment webhook --namespace=knative-serving --containers=webhook --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
+# kubectl set resources deployment activator --namespace=knative-serving --containers=activator --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
+# kubectl set resources deployment autoscaler --namespace=knative-serving --containers=autoscaler --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
+# kubectl set resources deployment controller --namespace=knative-serving --containers=controller --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
+# kubectl set resources deployment webhook --namespace=knative-serving --containers=webhook --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
 
-kubectl wait deployment.apps/activator --namespace=knative-serving --for=condition=available --timeout=300s
-kubectl wait deployment.apps/autoscaler --namespace=knative-serving --for=condition=available --timeout=300s
-kubectl wait deployment.apps/controller --namespace=knative-serving --for=condition=available --timeout=300s
-kubectl wait deployment.apps/webhook --namespace=knative-serving --for=condition=available --timeout=300s
+# kubectl wait deployment.apps/activator --namespace=knative-serving --for=condition=available --timeout=300s
+# kubectl wait deployment.apps/autoscaler --namespace=knative-serving --for=condition=available --timeout=300s
+# kubectl wait deployment.apps/controller --namespace=knative-serving --for=condition=available --timeout=300s
+# kubectl wait deployment.apps/webhook --namespace=knative-serving --for=condition=available --timeout=300s
 
-# Install Istio
-curl --location https://git.io/getLatestIstio | sh -
-sudo install istio-${ISTIO_VERSION}/bin/istioctl /usr/bin/istioctl
-istioctl install --filename=istio-minimal-operator.yaml
+# # Install Istio
+# curl --location https://git.io/getLatestIstio | sh -
+# sudo install istio-${ISTIO_VERSION}/bin/istioctl /usr/bin/istioctl
+# istioctl install --filename=istio-minimal-operator.yaml
 
-kubectl apply --filename=https://github.com/knative/net-istio/releases/download/v0.15.0/release.yaml
-kubectl patch configmap/config-domain --namespace=knative-serving --type=merge --patch='{"data":{"127.0.0.1.xip.io":""}}'
+# kubectl apply --filename=https://github.com/knative/net-istio/releases/download/v0.15.0/release.yaml
+# kubectl patch configmap/config-domain --namespace=knative-serving --type=merge --patch='{"data":{"127.0.0.1.xip.io":""}}'
 
-# Install Cert Manager
-kubectl apply --validate=false --filename=https://github.com/jetstack/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml
-kubectl wait deployment/cert-manager-webhook --namespace=cert-manager --for=condition=available --timeout=600s
+# # Install Cert Manager
+# kubectl apply --validate=false --filename=https://github.com/jetstack/cert-manager/releases/download/${CERT_MANAGER_VERSION}/cert-manager.yaml
+# kubectl wait deployment/cert-manager-webhook --namespace=cert-manager --for=condition=available --timeout=600s
 
-# Install Spark Operator
-# kubectl create namespace spark-operator
-# helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
-# helm install spark-operator incubator/sparkoperator --version=${SPARK_OPERATOR_VERSION} --values=spark-operator-values.yaml --namespace=spark-operator --wait --timeout 600s
+# # Install Spark Operator
+# # kubectl create namespace spark-operator
+# # helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
+# # helm install spark-operator incubator/sparkoperator --version=${SPARK_OPERATOR_VERSION} --values=spark-operator-values.yaml --namespace=spark-operator --wait --timeout 600s
 
-# Install KFServing
-kubectl apply --filename=https://raw.githubusercontent.com/kubeflow/kfserving/master/install/${KFSERVING_VERSION}/kfserving.yaml
-kubectl wait pod/kfserving-controller-manager-0 --namespace=kfserving-system --for=condition=ready --timeout=300s
+# # Install KFServing
+# kubectl apply --filename=https://raw.githubusercontent.com/kubeflow/kfserving/master/install/${KFSERVING_VERSION}/kfserving.yaml
+# kubectl wait pod/kfserving-controller-manager-0 --namespace=kfserving-system --for=condition=ready --timeout=300s
 
-# Install Vault
-kubectl create namespace vault
-helm repo add hashicorp https://helm.releases.hashicorp.com
-helm install vault hashicorp/vault --version=${VAULT_VERSION} --values=vault-values.yaml --namespace=vault
-kubectl wait pod/vault-0 --namespace=vault --for=condition=ready --timeout=300s
-# Downgrade to Vault KV secrets engine version 1
-kubectl exec vault-0 --namespace=vault -- vault secrets disable secret
-kubectl exec vault-0 --namespace=vault -- vault secrets enable -version=1 -path=secret kv
+# # Install Vault
+# kubectl create namespace vault
+# helm repo add hashicorp https://helm.releases.hashicorp.com
+# helm install vault hashicorp/vault --version=${VAULT_VERSION} --values=vault-values.yaml --namespace=vault
+# kubectl wait pod/vault-0 --namespace=vault --for=condition=ready --timeout=300s
+# # Downgrade to Vault KV secrets engine version 1
+# kubectl exec vault-0 --namespace=vault -- vault secrets disable secret
+# kubectl exec vault-0 --namespace=vault -- vault secrets enable -version=1 -path=secret kv
 
-# Save KinD cluster credential to Vault
-kubectl cp cluster-credential.json vault/vault-0:/tmp/cluster-credential.json
-kubectl exec vault-0 --namespace=vault -- vault kv put secret/${CLUSTER_NAME} @/tmp/cluster-credential.json
+# # Save KinD cluster credential to Vault
+# kubectl cp cluster-credential.json vault/vault-0:/tmp/cluster-credential.json
+# kubectl exec vault-0 --namespace=vault -- vault kv put secret/${CLUSTER_NAME} @/tmp/cluster-credential.json
 
 set +ex
