@@ -20,6 +20,19 @@ pip3 install yq
 # Provision KinD cluster
 kind create cluster --name=${CLUSTER_NAME} --config=kind-config.yaml --image=kindest/node:${KIND_NODE_VERSION}
 sleep 10
+kind get clusters
+kind get kubeconfig > kubeconfig.yaml
+
+# Write cluster credential to be saved in Vault
+cat <<EOF > cluster-credential.json
+{
+  "name": "$(yq -r '.clusters[0].name' kubeconfig.yaml)",
+  "master_ip": "$(yq -r '.clusters[0].cluster.server' kubeconfig.yaml)",
+  "certs": "$(yq -r '.clusters[0].cluster."certificate-authority-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')",
+  "client_certificate": "$(yq -r '.users[0].user."client-certificate-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')",
+  "client_key": "$(yq -r '.users[0].user."client-key-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')"
+}
+EOF
 
 # Install Knative
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-crds.yaml
@@ -65,19 +78,7 @@ kubectl wait pod/vault-0 --namespace=vault --for=condition=ready --timeout=300s
 kubectl exec vault-0 --namespace=vault -- vault secrets disable secret
 kubectl exec vault-0 --namespace=vault -- vault secrets enable -version=1 -path=secret kv
 
-# Put KinD cluster credential to Vault
-kubectl get pods --all-namespaces
-kubectl describe nodes
-kind get kubeconfig > kubeconfig.yaml
-cat <<EOF > cluster-credential.json
-{
-  "name": "$(yq -r '.clusters[0].name' kubeconfig.yaml)",
-  "master_ip": "$(yq -r '.clusters[0].cluster.server' kubeconfig.yaml)",
-  "certs": "$(yq -r '.clusters[0].cluster."certificate-authority-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')",
-  "client_certificate": "$(yq -r '.users[0].user."client-certificate-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')",
-  "client_key": "$(yq -r '.users[0].user."client-key-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')"
-}
-EOF
+# Save KinD cluster credential to Vault
 kubectl cp cluster-credential.json vault/vault-0:/tmp/cluster-credential.json
 kubectl exec vault-0 --namespace=vault -- vault kv put secret/${CLUSTER_NAME} @/tmp/cluster-credential.json
 
