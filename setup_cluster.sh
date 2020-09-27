@@ -81,4 +81,7 @@ kubectl exec vault-0 --namespace=vault -- vault secrets enable -version=1 -path=
 kubectl cp cluster-credential.json vault/vault-0:/tmp/cluster-credential.json
 kubectl exec vault-0 --namespace=vault -- vault kv put secret/${CLUSTER_NAME} @/tmp/cluster-credential.json
 
+# Print node information
+kubectl describe nodes
+
 set +ex
