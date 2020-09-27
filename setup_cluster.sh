@@ -34,6 +34,7 @@ kind create cluster --config=kind-config.yaml --image=kindest/node:${KIND_NODE_V
 # kubectl wait pod/kfserving-controller-manager-0 --namespace=kfserving-system --for=condition=ready --timeout=300s
 
 # Install Vault
+kubectl create namespace vault
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm install vault hashicorp/vault --version=${VAULT_VERSION} --namespace=vault
 kubectl get all --namespace=vault
