@@ -68,7 +68,6 @@ kubectl exec vault-0 --namespace=vault -- vault secrets enable -version=1 -path=
 sleep 15
 kubectl describe nodes
 kubectl get pods --all-namespaces
-kubectl cluster-info --context=${CLUSTER_NAME}
 kind get kubeconfig > kubeconfig.yaml
 cat <<EOF > cluster-credential.json
 {
