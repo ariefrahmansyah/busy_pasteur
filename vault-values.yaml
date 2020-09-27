@@ -2,8 +2,6 @@ injector:
   enabled: false
 
 server:
-  affinity: null
-
   dataStorage:
     enabled: false
 
@@ -14,3 +12,6 @@ server:
     limits:
       memory: 128Mi
       cpu: 100m
+
+  affinity: null
+  tolerations: null
