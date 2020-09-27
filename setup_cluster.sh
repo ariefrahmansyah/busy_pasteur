@@ -55,7 +55,7 @@ kubectl create namespace spark-operator
 helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
 helm install sparkoperator incubator/sparkoperator --values=spark-operator-values.yaml --namespace=spark-operator
 sleep 120
-kubectl get po -o yaml --namespace=spark-operator
+kubectl get po --namespace=spark-operator
 kubectl get po -o yaml --namespace=spark-operator
 
 # # Put KinD cluster credential to Vault
