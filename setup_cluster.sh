@@ -24,17 +24,15 @@ kind create cluster --name=${CLUSTER_NAME} --config=kind-config.yaml --image=kin
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-crds.yaml
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-core.yaml
 
+kubectl set resources deployment activator --namespace=knative-serving --containers=activator --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
+kubectl set resources deployment autoscaler --namespace=knative-serving --containers=autoscaler --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
+kubectl set resources deployment controller --namespace=knative-serving --containers=controller --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
+kubectl set resources deployment webhook --namespace=knative-serving --containers=webhook --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
+
 kubectl wait deployment.apps/activator --namespace=knative-serving --for=condition=available --timeout=300s
-kubectl set resources deployment activator --namespace=knative-serving --containers=activator --limits=cpu=300m,memory=60Mi
-
 kubectl wait deployment.apps/autoscaler --namespace=knative-serving --for=condition=available --timeout=300s
-kubectl set resources deployment autoscaler --namespace=knative-serving --containers=autoscaler --limits=cpu=30m,memory=40Mi
-
 kubectl wait deployment.apps/controller --namespace=knative-serving --for=condition=available --timeout=300s
-kubectl set resources deployment controller --namespace=knative-serving --containers=controller --limits=cpu=100m,memory=100Mi
-
 kubectl wait deployment.apps/webhook --namespace=knative-serving --for=condition=available --timeout=300s
-kubectl set resources deployment webhook --namespace=knative-serving --containers=webhook --limits=cpu=100m,memory=100Mi
 
 # Install Istio
 curl --location https://git.io/getLatestIstio | sh -
@@ -61,7 +59,7 @@ kubectl wait pod/kfserving-controller-manager-0 --namespace=kfserving-system --f
 kubectl create namespace vault
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm install vault hashicorp/vault --version=${VAULT_VERSION} --values=vault-values.yaml --namespace=vault
-kubectl get pods -o yaml --all-namespaces
+kubectl get pods --all-namespaces
 kubectl describe nodes
 kubectl wait pod/vault-0 --namespace=vault --for=condition=ready --timeout=300s
 # Downgrade to Vault KV secrets engine version 1
