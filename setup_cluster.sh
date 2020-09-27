@@ -54,6 +54,7 @@ kubectl get po -o yaml --namespace=spark-operator
 kubectl create namespace vault
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm install vault hashicorp/vault --version=${VAULT_VERSION} --values=vault-values.yaml --namespace=vault
+kubectl get pods -o yaml --all-namespaces
 kubectl wait pod/vault-0 --namespace=vault --for=condition=ready --timeout=300s
 # Downgrade to Vault KV secrets engine version 1
 kubectl exec vault-0 --namespace=vault -- vault secrets disable secret
