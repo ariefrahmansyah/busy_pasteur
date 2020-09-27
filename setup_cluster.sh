@@ -39,5 +39,6 @@ helm repo add hashicorp https://helm.releases.hashicorp.com
 helm install vault hashicorp/vault --version=${VAULT_VERSION} --namespace=vault
 sleep 30
 kubectl get all --namespace=vault
+kubectl get pods -l app.kubernetes.io/name=vault --namespace=vault
 
 set +ex
