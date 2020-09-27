@@ -52,13 +52,14 @@ kubectl exec vault-0 --namespace=vault -- vault secrets enable -version=1 -path=
 
 # Put KinD cluster credential to Vault
 kind get kubeconfig > kubeconfig.yaml
+cat kubeconfig.yaml
 cat <<EOF > cluster-credential.json
 {
   "name": "$(yq -r '.clusters[0].name' kubeconfig.yaml)",
   "master_ip": "$(yq -r '.clusters[0].cluster.server' kubeconfig.yaml)",
-  "certs": "$(yq -r '.clusters[0].cluster."certificate-authority-data"' kubeconfig.yaml | base64 -D | awk '{printf "%s\\n", $0}')",
-  "client_certificate": "$(yq -r '.users[0].user."client-certificate-data"' kubeconfig.yaml | base64 -D | awk '{printf "%s\\n", $0}')",
-  "client_key": "$(yq -r '.users[0].user."client-key-data"' kubeconfig.yaml | base64 -D | awk '{printf "%s\\n", $0}')"
+  "certs": "$(yq -r '.clusters[0].cluster."certificate-authority-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')",
+  "client_certificate": "$(yq -r '.users[0].user."client-certificate-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')",
+  "client_key": "$(yq -r '.users[0].user."client-key-data"' kubeconfig.yaml | base64 --decode | awk '{printf "%s\\n", $0}')"
 }
 EOF
 
