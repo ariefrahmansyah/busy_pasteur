@@ -6,3 +6,6 @@ server:
     limits:
       memory: 128Mi
       cpu: 100m
+
+  dataStorage:
+    enabled: false
