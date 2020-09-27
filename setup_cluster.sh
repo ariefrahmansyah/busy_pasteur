@@ -37,7 +37,6 @@ kind create cluster --config=kind-config.yaml --image=kindest/node:${KIND_NODE_V
 kubectl create namespace vault
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm install vault hashicorp/vault --version=${VAULT_VERSION} --namespace=vault
-kubectl get pods --namespace=vault
-kubectl wait pod/vault-0 --for=condition=podscheduled --namespace=vault
+kubectl describe statefulset.apps --namespace=vault
 
 set +ex
