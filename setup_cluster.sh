@@ -7,6 +7,7 @@ export KNATIVE_VERSION=v0.15.0
 export ISTIO_VERSION=1.6.2
 export CERT_MANAGER_VERSION=v0.15.1
 export KFSERVING_VERSION=v0.4.0
+export SPARK_OPERATOR_VERSION=0.6.12
 export VAULT_VERSION=0.7.0
 
 export CLUSTER_NAME=dev
@@ -44,7 +45,7 @@ kubectl wait pod/kfserving-controller-manager-0 --namespace=kfserving-system --f
 # Install Spark Operator
 kubectl create namespace spark-operator
 helm repo add incubator http://storage.googleapis.com/kubernetes-charts-incubator
-helm install spark-operator incubator/sparkoperator --values=spark-operator-values.yaml --namespace=spark-operator --wait --timeout 600s
+helm install spark-operator incubator/sparkoperator --version=${SPARK_OPERATOR_VERSION} --values=spark-operator-values.yaml --namespace=spark-operator --wait --timeout 600s
 sleep 120
 kubectl get po --namespace=spark-operator
 kubectl get po -o yaml --namespace=spark-operator
