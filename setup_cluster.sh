@@ -20,7 +20,8 @@ pip3 install yq
 # Provision KinD cluster
 kind create cluster --name=${CLUSTER_NAME} --config=kind-config.yaml --image=kindest/node:${KIND_NODE_VERSION}
 kind get clusters
-kind get kubeconfig
+kind get nodes
+kind get kubeconfig --name ${CLUSTER_NAME}
 # kind get kubeconfig > kubeconfig.yaml
 
 # # Write cluster credential to be saved in Vault
