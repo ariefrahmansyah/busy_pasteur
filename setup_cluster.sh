@@ -42,7 +42,8 @@ kubectl create namespace vault
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm install vault hashicorp/vault --version=${VAULT_VERSION} --values=vault-values.yaml --namespace=vault
 sleep 15
-kubectl get pod -o yaml --namespace=vault
+kubectl get nodes -o yaml
+kubectl get all -o yaml --namespace=vault
 kubectl exec vault-0 --namespace=vault -- vault operator init -key-shares=1 -key-threshold=1 -format=json > init.json
 export UNSEAL_KEY=$(cat init.json | jq -r '.unseal_keys_b64[0]')
 kubectl exec vault-0 --namespace=vault -- vault operator unseal ${UNSEAL_KEY}
