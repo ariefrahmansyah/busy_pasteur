@@ -2,6 +2,9 @@ injector:
   enabled: false
 
 server:
+  dataStorage:
+    enabled: false
+
   resources:
     requests:
       memory: 128Mi
@@ -9,6 +12,3 @@ server:
     limits:
       memory: 128Mi
       cpu: 100m
-
-  dataStorage:
-    enabled: false
