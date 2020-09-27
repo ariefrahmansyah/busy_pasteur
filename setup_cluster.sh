@@ -8,6 +8,8 @@ export ISTIO_VERSION=1.6.2
 export CERT_MANAGER_VERSION=v0.15.1
 export KFSERVING_VERSION=v0.4.0
 
+helm version
+
 # Provision KinD cluster
 kind create cluster --config=kind-config.yaml --image=kindest/node:${KIND_NODE_VERSION}
 
@@ -32,6 +34,7 @@ kubectl wait deployment/cert-manager-webhook --namespace=cert-manager --for=cond
 kubectl apply --filename=https://raw.githubusercontent.com/kubeflow/kfserving/master/install/${KFSERVING_VERSION}/kfserving.yaml
 kubectl wait pod/kfserving-controller-manager-0 --namespace=kfserving-system --for=condition=ready --timeout=300s
 
-sleep 10
+# Install Vault
+
 
 set +ex
