@@ -19,7 +19,6 @@ pip3 install yq
 
 # Provision KinD cluster
 kind create cluster --name=${CLUSTER_NAME} --config=kind-config.yaml --image=kindest/node:${KIND_NODE_VERSION}
-sleep 10
 
 # Install Knative
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-crds.yaml
@@ -60,14 +59,16 @@ kubectl wait pod/kfserving-controller-manager-0 --namespace=kfserving-system --f
 kubectl create namespace vault
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm install vault hashicorp/vault --version=${VAULT_VERSION} --values=vault-values.yaml --namespace=vault
-kubectl get pods --all-namespaces
-kubectl describe nodes
 kubectl wait pod/vault-0 --namespace=vault --for=condition=ready --timeout=300s
 # Downgrade to Vault KV secrets engine version 1
 kubectl exec vault-0 --namespace=vault -- vault secrets disable secret
 kubectl exec vault-0 --namespace=vault -- vault secrets enable -version=1 -path=secret kv
 
 # Put KinD cluster credential to Vault
+sleep 15
+kubectl describe nodes
+kubectl get pods --all-namespaces
+kubectl cluster-info --context=${CLUSTER_NAME}
 kind get kubeconfig > kubeconfig.yaml
 cat <<EOF > cluster-credential.json
 {
