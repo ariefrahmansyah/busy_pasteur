@@ -15,6 +15,7 @@ test -x jq || sudo apt-get install jq
 
 # Provision KinD cluster
 kind create cluster --config=kind-config.yaml --image=kindest/node:${KIND_NODE_VERSION}
+sleep 15
 
 # # Install Knative
 # kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-crds.yaml
