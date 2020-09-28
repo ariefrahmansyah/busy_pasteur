@@ -36,10 +36,10 @@ EOF
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-crds.yaml
 kubectl apply --filename=https://github.com/knative/serving/releases/download/${KNATIVE_VERSION}/serving-core.yaml
 
-kubectl set resources deployment activator --namespace=knative-serving --containers=activator --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
-kubectl set resources deployment autoscaler --namespace=knative-serving --containers=autoscaler --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
-kubectl set resources deployment controller --namespace=knative-serving --containers=controller --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
-kubectl set resources deployment webhook --namespace=knative-serving --containers=webhook --requests=cpu=30m,memory=64Mi --limits=cpu=300m,memory=256Mi
+kubectl set resources deployment activator --namespace=knative-serving --containers=activator --requests=cpu=25m,memory=64Mi --limits=cpu=300m,memory=256Mi
+kubectl set resources deployment autoscaler --namespace=knative-serving --containers=autoscaler --requests=cpu=25m,memory=64Mi --limits=cpu=300m,memory=256Mi
+kubectl set resources deployment controller --namespace=knative-serving --containers=controller --requests=cpu=25m,memory=64Mi --limits=cpu=300m,memory=256Mi
+kubectl set resources deployment webhook --namespace=knative-serving --containers=webhook --requests=cpu=25m,memory=64Mi --limits=cpu=300m,memory=256Mi
 
 kubectl wait deployment.apps/activator --namespace=knative-serving --for=condition=available --timeout=300s
 kubectl wait deployment.apps/autoscaler --namespace=knative-serving --for=condition=available --timeout=300s

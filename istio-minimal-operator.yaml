@@ -15,10 +15,9 @@ spec:
     pilot:
       resources:
         requests:
-          cpu: 50m
+          cpu: 25m
           memory: 64Mi
         limits:
-          cpu: 100m
           memory: 128Mi
 
   addonComponents:
@@ -40,10 +39,9 @@ spec:
             value: 80
         resources:
           requests:
-            cpu: 50m
+            cpu: 25m
             memory: 64Mi
           limits:
-            cpu: 100m
             memory: 128Mi
     - name: cluster-local-gateway
       enabled: true
@@ -53,10 +51,9 @@ spec:
       k8s:
         resources:
           requests:
-            cpu: 50m
+            cpu: 25m
             memory: 64Mi
           limits:
-            cpu: 100m
             memory: 128Mi
         service:
           type: ClusterIP
