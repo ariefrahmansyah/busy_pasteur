@@ -13,6 +13,14 @@ jobs:
       run: |
         ./setup_cluster.sh
 
+    - name: Test Istio Ingress Kubernetes
+      run: |
+        kubectl create namespace istio-test
+        kubectl apply -f https://raw.githubusercontent.com/istio/istio/1.6.2/samples/httpbin/httpbin.yaml -n istio-test
+        kubectl wait deployment/httpbin --namespace=istio-test --for=condition=available --timeout=600s
+        sleep 5
+        curl http://http-bin.istio-test.127.0.0.1/status/200
+
     - name: Test KFServing installation
       run: |
         kubectl create namespace kfserving-test
